@@ -4,20 +4,57 @@
     <title>Motor Status Dashboard</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
-        body { font-family: Arial; text-align: center; padding-top: 100px; }
-        h1 { font-size: 2.5em; }
-        .status { font-size: 2em; margin-top: 30px; }
+        body {
+            font-family: Arial;
+            text-align: center;
+            padding-top: 100px;
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            font-size: 2.5em;
+        }
+
+        .status {
+            font-size: 2em;
+            margin-top: 30px;
+        }
+
+        /* Updated color classes */
+        .green { color: green; }
+        .yellow { color: goldenrod; }
+        .red { color: red; }
+        .black { color: black; }
     </style>
 </head>
 <body>
-    <h1>Motor State: <span id="state">Waiting for data...</span></h1>
+    <h1>Motor State: <span id="state" class="black">Waiting for data...</span></h1>
     <div class="status">Confidence: <span id="confidence">-</span></div>
 
     <script>
         const socket = io();
+        const stateSpan = document.getElementById('state');
+        const confidenceSpan = document.getElementById('confidence');
+
         socket.on('update', function(data) {
-            document.getElementById('state').innerText = data.state;
-            document.getElementById('confidence').innerText = data.confidence;
+            const state = data.state;
+
+            // Remove all color classes
+            stateSpan.classList.remove('green', 'yellow', 'red', 'black');
+
+            // Set text and apply new color based on state
+            stateSpan.innerText = state;
+            confidenceSpan.innerText = data.confidence;
+
+            if (state === 'normaal') {
+                stateSpan.classList.add('green');
+            } else if (state === 'abnormaal') {
+                stateSpan.classList.add('yellow');
+            } else if (state === 'uit') {
+                stateSpan.classList.add('red');
+            } else {
+                stateSpan.classList.add('black');
+            }
         });
     </script>
 </body>
