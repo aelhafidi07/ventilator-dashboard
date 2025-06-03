@@ -58,27 +58,52 @@
 
         /* Flashing effect for abnormal states */
         .flashing {
-            animation: flashing 1s infinite alternate;
+            animation: flashing 0.5s infinite alternate, pulse 1s infinite alternate;
         }
 
         /* Flashing keyframes */
         @keyframes flashing {
             0% {
-                opacity: 0.8;
+                opacity: 0.7;
+                background-color: #e53935; /* Bright red */
             }
             100% {
                 opacity: 1;
+                background-color: #ff1744; /* Darker red for scarier effect */
             }
         }
+
+        /* Pulse effect */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1); /* Slightly enlarge the element */
+            }
+        }
+
+        /* Loader styling */
+        #loading {
+            font-size: 1.5em;
+            color: #666;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
     <div class="dashboard-box" id="dashboard-box">
         <h1>Motor State: <span id="state" class="black">Wachten op data...</span></h1>
-        <div class="status"><span id="confidence">-</span></div> <!-- Removed the text label, just showing the percentage -->
+        <div class="status">
+            <span id="confidence">-</span>
+        </div> <!-- Removed the text label, just showing the percentage -->
 
         <!-- Audio alert -->
         <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
+
+        <!-- Loading message -->
+        <div id="loading">Wachten op data...</div>
     </div>
 
     <script>
@@ -87,11 +112,18 @@
         const confidenceSpan = document.getElementById('confidence');
         const alertSound = document.getElementById('alert-sound');
         const dashboardBox = document.getElementById('dashboard-box');
+        const loadingMessage = document.getElementById('loading');
 
         let lastState = '';
 
+        // Initially show loading message
+        loadingMessage.style.display = 'block';
+
         socket.on('update', function(data) {
             const state = data.state;
+
+            // Hide loading message once data is received
+            loadingMessage.style.display = 'none';
 
             // Update only if state has changed
             if (state !== lastState) {
@@ -136,3 +168,4 @@
     </script>
 </body>
 </html>
+
