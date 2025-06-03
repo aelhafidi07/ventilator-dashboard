@@ -3,6 +3,7 @@ import threading
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+import socket
 
 # Setup Flask app
 app = Flask(__name__)
@@ -39,12 +40,24 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        ip_address = request.remote_addr  # Get the user's IP address
+
+        # Log the login attempt (successful or failed)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
         if check_authentication(username, password):
             session['username'] = username
+            log_line = f"[{timestamp}] Inlogpoging (GESLAAGD) - Gebruiker: {username} - IP: {ip_address}\n"
+            with open('login_log.txt', 'a') as log_file:
+                log_file.write(log_line)
             return redirect(url_for('dashboard'))
         else:
+            log_line = f"[{timestamp}] Inlogpoging (MISLUKT) - Gebruiker: {username} - IP: {ip_address}\n"
+            with open('login_log.txt', 'a') as log_file:
+                log_file.write(log_line)
             flash('Ongeldige gebruikersnaam of wachtwoord.')
             return redirect(url_for('login'))
+
     return render_template('login.html')
 
 @app.route('/dashboard')
@@ -55,6 +68,13 @@ def dashboard():
 
 @app.route('/logout')
 def logout():
+    # Log logout details
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    ip_address = request.remote_addr  # Get the user's IP address
+    log_line = f"[{timestamp}] Logout: {session['username']} - IP: {ip_address}\n"
+    with open('login_log.txt', 'a') as log_file:
+        log_file.write(log_line)
+        
     session.pop('username', None)
     return redirect(url_for('login'))
 

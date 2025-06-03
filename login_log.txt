@@ -1,3 +1,10 @@
 [2025-05-13 08:45:57] Inlogpoging (MISLUKT) - Gebruiker: egs - IP: 127.0.0.1
 [2025-05-13 08:46:02] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
 [2025-05-13 08:52:02] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
+[2025-05-14 12:32:53] Logout: user1
+[2025-05-14 12:33:12] Login: admin
+[2025-05-14 12:33:34] Logout: admin
+[2025-05-14 12:35:21] Inlogpoging (MISLUKT) - Gebruiker: hacker123 - IP: 127.0.0.1
+[2025-05-14 12:35:25] Inlogpoging (MISLUKT) - Gebruiker: monster456 - IP: 127.0.0.1
+[2025-05-14 12:35:29] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
+[2025-05-14 12:35:47] Logout: user1 - IP: 127.0.0.1
