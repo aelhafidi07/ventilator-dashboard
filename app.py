@@ -22,37 +22,46 @@ USERS = {"admin": "password123"}
 def check_authentication(username, password):
     return USERS.get(username) == password
 
+# Route for the index (Login page)
 @app.route('/')
 def index():
-    # If user is logged in, redirect to the dashboard
+    # Check if the user is logged in (i.e., check session for 'username')
     if 'username' in session:
+        # Redirect to dashboard if logged in
         return redirect(url_for('dashboard'))
     # Otherwise, show login page
     return render_template('login.html')
 
+# Route to handle login form submission
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
 
     if check_authentication(username, password):
-        session['username'] = username  # Store the username in session
+        # Store the username in session and redirect to dashboard
+        session['username'] = username
         return redirect(url_for('dashboard'))
     else:
-        return redirect(url_for('index'))  # Redirect back to login if authentication fails
+        # Redirect to the login page if credentials are incorrect
+        return redirect(url_for('index'))
 
+# Route for the dashboard
 @app.route('/dashboard')
 def dashboard():
-    # If user is not logged in, redirect to login
+    # If the user is not logged in, redirect them to the login page
     if 'username' not in session:
-        return redirect(url_for('index'))
-    return render_template('dashboard.html')
+        return redirect(url_for('index'))  # Redirect to login page
+    return render_template('dashboard.html')  # Otherwise, render the dashboard
 
+# Route to log the user out
 @app.route('/logout')
 def logout():
-    session.pop('username', None)  # Remove user from session
+    # Remove user from session and redirect to login page
+    session.pop('username', None)
     return redirect(url_for('index'))  # Redirect to login page
 
+# Serial reading function
 def read_from_serial():
     global motor_state, confidence
 
@@ -80,10 +89,12 @@ def read_from_serial():
     except serial.SerialException:
         print(f"[ERROR] Could not open serial port {SERIAL_PORT}")
 
+# Handle socket connection
 @socketio.on('connect')
 def handle_connect():
     emit('update', {'state': motor_state, 'confidence': confidence})
 
+# Run the app with socketio
 if __name__ == '__main__':
     thread = threading.Thread(target=read_from_serial)
     thread.daemon = True

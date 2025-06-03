@@ -1,15 +1,14 @@
 <!DOCTYPE html> 
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Status Dashboard</title>
+    <title>Motorstatus Dashboard</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
-        /* General styling */
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #f7f8fa, #e2e8f0); /* Soft gradient background */
+            background: linear-gradient(135deg, #f7f8fa, #e2e8f0);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,7 +17,6 @@
             color: #333;
         }
 
-        /* Centered box for content */
         .dashboard-box {
             background-color: #fff;
             border-radius: 10px;
@@ -26,7 +24,7 @@
             padding: 40px 60px;
             text-align: center;
             width: 350px;
-            transition: background-color 1s ease; /* Smooth transition for color changes */
+            transition: background-color 1s ease;
         }
 
         h1 {
@@ -37,72 +35,62 @@
         .status {
             font-size: 1.5em;
             margin-top: 30px;
-            color: #fff; /* White color for the status text */
+            font-weight: bold;
+            color: white; /* ✅ percentage wit maken */
         }
 
-        /* Ensure the state text is always white */
         #state {
-            color: white !important; /* Force white color for the state text */
+            color: white !important;
         }
 
-        /* State colors */
         .green { color: #4caf50; }
         .yellow { color: #fbc02d; }
         .red { color: #e53935; }
         .black { color: #616161; }
 
-        /* Audio alert hidden by default, but can be triggered */
         audio {
             display: none;
         }
 
-        /* Flashing effect for abnormal states */
         .flashing {
             animation: flashing 0.5s infinite alternate, pulse 1s infinite alternate;
         }
 
-        /* Flashing keyframes */
         @keyframes flashing {
             0% {
                 opacity: 0.7;
-                background-color: #e53935; /* Bright red */
+                background-color: #e53935;
             }
             100% {
                 opacity: 1;
-                background-color: #ff1744; /* Darker red for scarier effect */
+                background-color: #ff1744;
             }
         }
 
-        /* Pulse effect */
         @keyframes pulse {
             0% {
                 transform: scale(1);
             }
             100% {
-                transform: scale(1.1); /* Slightly enlarge the element */
+                transform: scale(1.1);
             }
         }
 
-        /* Loader styling */
         #loading {
             font-size: 1.5em;
             color: #666;
             margin-top: 20px;
         }
-
     </style>
 </head>
 <body>
     <div class="dashboard-box" id="dashboard-box">
-        <h1>Motor State: <span id="state" class="black">Wachten op data...</span></h1>
+        <h1>Motorstatus: <span id="state" class="black">Wachten op data...</span></h1>
         <div class="status">
             <span id="confidence">-</span>
-        </div> <!-- Removed the text label, just showing the percentage -->
+        </div>
 
-        <!-- Audio alert -->
         <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
-
-        <!-- Loading message -->
         <div id="loading">Wachten op data...</div>
     </div>
 
@@ -116,53 +104,45 @@
 
         let lastState = '';
 
-        // Initially show loading message
         loadingMessage.style.display = 'block';
 
         socket.on('update', function(data) {
             const state = data.state;
 
-            // Hide loading message once data is received
             loadingMessage.style.display = 'none';
 
-            // Update only if state has changed
             if (state !== lastState) {
-                // Play alert if critical state
                 if (state === 'abnormaal' || state === 'uit') {
                     alertSound.play().catch(() => {
-                        console.log("⚠️ Unable to play sound automatically.");
+                        console.log("⚠️ Kan geluid niet automatisch afspelen.");
                     });
-                    // Apply flashing effect for abnormal or off states
                     dashboardBox.classList.add('flashing');
                 } else {
-                    // Stop the sound and remove flashing effect when the state is normaal
                     alertSound.pause();
-                    alertSound.currentTime = 0; // Reset the sound to the beginning
+                    alertSound.currentTime = 0;
                     dashboardBox.classList.remove('flashing');
                 }
 
                 lastState = state;
             }
 
-            // Remove old colors
             stateSpan.classList.remove('green', 'yellow', 'red', 'black');
 
-            // Update text and apply new color based on state
             stateSpan.innerText = state;
-            confidenceSpan.innerText = data.confidence;  // Confidence is now percentage
+            confidenceSpan.innerText = data.confidence;
 
             if (state === 'normaal') {
                 stateSpan.classList.add('green');
-                dashboardBox.style.backgroundColor = "#4caf50"; // Green background for normaal
+                dashboardBox.style.backgroundColor = "#4caf50";
             } else if (state === 'abnormaal') {
                 stateSpan.classList.add('yellow');
-                dashboardBox.style.backgroundColor = "#fbc02d"; // Yellow background for abnormaal
+                dashboardBox.style.backgroundColor = "#fbc02d";
             } else if (state === 'uit') {
                 stateSpan.classList.add('red');
-                dashboardBox.style.backgroundColor = "#e53935"; // Red background for uit
+                dashboardBox.style.backgroundColor = "#e53935";
             } else {
                 stateSpan.classList.add('black');
-                dashboardBox.style.backgroundColor = "#616161"; // Default black background
+                dashboardBox.style.backgroundColor = "#616161";
             }
         });
     </script>
