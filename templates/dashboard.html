@@ -124,47 +124,49 @@
         const alertSound = document.getElementById('alert-sound');
         const dashboardBox = document.getElementById('dashboard-box');
         const loadingMessage = document.getElementById('loading');
-
+    
         let lastState = '';
-
+    
         loadingMessage.style.display = 'block';
-
+    
         socket.on('update', function(data) {
             const state = data.state;
             loadingMessage.style.display = 'none';
-
+    
             if (state !== lastState) {
                 if (state === 'abnormaal' || state === 'uit') {
                     alertSound.play().catch(() => {
                         console.log("⚠️ Kan geluid niet automatisch afspelen.");
                     });
-                    dashboardBox.classList.add('flashing');
                 } else {
                     alertSound.pause();
                     alertSound.currentTime = 0;
-                    dashboardBox.classList.remove('flashing');
                 }
                 lastState = state;
             }
-
+    
             stateSpan.classList.remove('green', 'yellow', 'red', 'black');
+            dashboardBox.classList.remove('flashing-yellow', 'flashing-red');
+    
             stateSpan.innerText = state;
             confidenceSpan.innerText = data.confidence;
-
+    
             if (state === 'normaal') {
                 stateSpan.classList.add('green');
                 dashboardBox.style.backgroundColor = "#4caf50";
             } else if (state === 'abnormaal') {
                 stateSpan.classList.add('yellow');
                 dashboardBox.style.backgroundColor = "#fdd835";
+                dashboardBox.classList.add('flashing-yellow');
             } else if (state === 'uit') {
                 stateSpan.classList.add('red');
                 dashboardBox.style.backgroundColor = "#e53935";
+                dashboardBox.classList.add('flashing-red');
             } else {
                 stateSpan.classList.add('black');
                 dashboardBox.style.backgroundColor = "#616161";
             }
         });
-    </script>
+    </script>    
 </body>
 </html>

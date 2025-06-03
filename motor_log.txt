@@ -1,0 +1,7 @@
+[2025-05-13 09:07:12] State: uit, Confidence: 99.61%
+[2025-05-13 09:07:14] State: uit, Confidence: 99.22%
+[2025-05-13 09:07:17] State: uit, Confidence: 99.61%
+[2025-05-13 09:07:19] State: normaal, Confidence: 99.61%
+[2025-05-13 09:07:22] State: normaal, Confidence: 73.44%
+[2025-05-13 09:07:24] State: abnormaal, Confidence: 99.61%
+[2025-05-13 09:07:27] State: uit, Confidence: 99.61%

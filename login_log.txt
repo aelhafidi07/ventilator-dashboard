@@ -1,0 +1,3 @@
+[2025-05-13 08:45:57] Inlogpoging (MISLUKT) - Gebruiker: egs - IP: 127.0.0.1
+[2025-05-13 08:46:02] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
+[2025-05-13 08:52:02] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1

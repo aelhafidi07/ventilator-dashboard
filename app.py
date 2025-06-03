@@ -2,6 +2,7 @@ import serial
 import threading
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO, emit
+from datetime import datetime
 
 # Setup Flask app
 app = Flask(__name__)
@@ -77,9 +78,17 @@ def read_from_serial():
                         results[label.strip()] = float(value.strip())
                     except:
                         continue
+                
                 motor_state = max(results, key=results.get)
                 confidence = f"{results[motor_state]*100:.2f}%"
                 socketio.emit('update', {'state': motor_state, 'confidence': confidence})
+
+                # Log to motor_log.txt
+                timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                log_line = f"[{timestamp}] State: {motor_state}, Confidence: {confidence}\n"
+                with open('motor_log.txt', 'a') as log_file:
+                    log_file.write(log_line)
+                
     except serial.SerialException:
         print(f"[ERROR] Kan seriële poort {SERIAL_PORT} niet openen")
 
