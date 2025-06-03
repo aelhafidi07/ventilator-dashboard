@@ -20,7 +20,6 @@
             margin-top: 30px;
         }
 
-        /* Updated color classes */
         .green { color: green; }
         .yellow { color: goldenrod; }
         .red { color: red; }
@@ -31,18 +30,36 @@
     <h1>Motor State: <span id="state" class="black">Waiting for data...</span></h1>
     <div class="status">Confidence: <span id="confidence">-</span></div>
 
+    <!-- Audio alert -->
+    <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
+
     <script>
         const socket = io();
         const stateSpan = document.getElementById('state');
         const confidenceSpan = document.getElementById('confidence');
+        const alertSound = document.getElementById('alert-sound');
+
+        let lastState = '';
 
         socket.on('update', function(data) {
             const state = data.state;
 
-            // Remove all color classes
+            // Update only if state has changed
+            if (state !== lastState) {
+                // Play alert if critical state
+                if (state === 'abnormaal' || state === 'uit') {
+                    alertSound.play().catch(() => {
+                        console.log("⚠️ Unable to play sound automatically.");
+                    });
+                }
+
+                lastState = state;
+            }
+
+            // Remove old colors
             stateSpan.classList.remove('green', 'yellow', 'red', 'black');
 
-            // Set text and apply new color based on state
+            // Update text and color
             stateSpan.innerText = state;
             confidenceSpan.innerText = data.confidence;
 
@@ -59,6 +76,3 @@
     </script>
 </body>
 </html>
-
-
-
