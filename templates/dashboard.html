@@ -74,8 +74,8 @@
 </head>
 <body>
     <div class="dashboard-box" id="dashboard-box">
-        <h1>Motor State: <span id="state" class="black">Waiting for data...</span></h1>
-        <div class="status">Confidence: <span id="confidence">-</span></div>
+        <h1>Motor State: <span id="state" class="black">Wachten op data...</span></h1>
+        <div class="status"><span id="confidence">-</span></div> <!-- Removed the text label, just showing the percentage -->
 
         <!-- Audio alert -->
         <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
@@ -117,7 +117,7 @@
 
             // Update text and apply new color based on state
             stateSpan.innerText = state;
-            confidenceSpan.innerText = data.confidence;
+            confidenceSpan.innerText = data.confidence;  // Confidence is now percentage
 
             if (state === 'normaal') {
                 stateSpan.classList.add('green');

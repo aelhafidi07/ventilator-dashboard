@@ -11,7 +11,7 @@ socketio = SocketIO(app)
 SERIAL_PORT = 'COM3'  # Update if needed
 BAUD_RATE = 115200
 
-motor_state = "Waiting for data..."
+motor_state = "Wachten op data..."  # Update to Dutch
 confidence = "-"
 
 @app.route('/')
@@ -40,7 +40,7 @@ def read_from_serial():
                     except:
                         continue
                 motor_state = max(results, key=results.get)
-                confidence = f"{results[motor_state]*100:.2f}%"
+                confidence = f"{results[motor_state]*100:.2f}%"  # Percentage for confidence
                 socketio.emit('update', {'state': motor_state, 'confidence': confidence})
     except serial.SerialException:
         print(f"[ERROR] Could not open serial port {SERIAL_PORT}")
