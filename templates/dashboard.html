@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Motor Status Dashboard</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial; text-align: center; padding-top: 100px; }
+        h1 { font-size: 2.5em; }
+        .status { font-size: 2em; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h1>Motor State: <span id="state">Waiting for data...</span></h1>
+    <div class="status">Confidence: <span id="confidence">-</span></div>
+
+    <script>
+        const socket = io();
+        socket.on('update', function(data) {
+            document.getElementById('state').innerText = data.state;
+            document.getElementById('confidence').innerText = data.confidence;
+        });
+    </script>
+</body>
+</html>
+
+
+
