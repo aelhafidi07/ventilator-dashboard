@@ -1,10 +1,11 @@
 import serial
 import threading
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, emit
 
 # Setup Flask app
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Change this to a secure secret key
 socketio = SocketIO(app)
 
 # Serial port settings
@@ -14,9 +15,43 @@ BAUD_RATE = 115200
 motor_state = "Wachten op data..."  # Update to Dutch
 confidence = "-"
 
+# Hardcoded users (for demo purposes)
+USERS = {"admin": "password123"}
+
+# Authentication function
+def check_authentication(username, password):
+    return USERS.get(username) == password
+
 @app.route('/')
 def index():
+    # If user is logged in, redirect to the dashboard
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+    # Otherwise, show login page
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+
+    if check_authentication(username, password):
+        session['username'] = username  # Store the username in session
+        return redirect(url_for('dashboard'))
+    else:
+        return redirect(url_for('index'))  # Redirect back to login if authentication fails
+
+@app.route('/dashboard')
+def dashboard():
+    # If user is not logged in, redirect to login
+    if 'username' not in session:
+        return redirect(url_for('index'))
     return render_template('dashboard.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)  # Remove user from session
+    return redirect(url_for('index'))  # Redirect to login page
 
 def read_from_serial():
     global motor_state, confidence
