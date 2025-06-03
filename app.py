@@ -1,6 +1,6 @@
 import serial
 import threading
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO, emit
 
 # Setup Flask app
@@ -12,62 +12,56 @@ socketio = SocketIO(app)
 SERIAL_PORT = 'COM3'  # Update if needed
 BAUD_RATE = 115200
 
-motor_state = "Wachten op data..."  # Update to Dutch
+motor_state = "Wachten op data..."
 confidence = "-"
 
-# Hardcoded users (for demo purposes)
-USERS = {"admin": "password123"}
+# Hardcoded users (replace usernames/passwords as needed)
+users = {
+    'admin': 'password123',
+    'user1': 'pass1',
+    'user2': 'pass2',
+    'user3': 'pass3',
+    'user4': 'pass4'
+}
 
-# Authentication function
 def check_authentication(username, password):
-    return USERS.get(username) == password
+    return users.get(username) == password
 
-# Route for the index (Login page)
 @app.route('/')
 def index():
-    # Check if the user is logged in (i.e., check session for 'username')
     if 'username' in session:
-        # Redirect to dashboard if logged in
         return redirect(url_for('dashboard'))
-    # Otherwise, show login page
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if check_authentication(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Ongeldige gebruikersnaam of wachtwoord.')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
-# Route to handle login form submission
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-
-    if check_authentication(username, password):
-        # Store the username in session and redirect to dashboard
-        session['username'] = username
-        return redirect(url_for('dashboard'))
-    else:
-        # Redirect to the login page if credentials are incorrect
-        return redirect(url_for('index'))
-
-# Route for the dashboard
 @app.route('/dashboard')
 def dashboard():
-    # If the user is not logged in, redirect them to the login page
     if 'username' not in session:
-        return redirect(url_for('index'))  # Redirect to login page
-    return render_template('dashboard.html')  # Otherwise, render the dashboard
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
 
-# Route to log the user out
 @app.route('/logout')
 def logout():
-    # Remove user from session and redirect to login page
     session.pop('username', None)
-    return redirect(url_for('index'))  # Redirect to login page
+    return redirect(url_for('login'))
 
-# Serial reading function
 def read_from_serial():
     global motor_state, confidence
-
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-        print(f"[INFO] Connected to {SERIAL_PORT}")
+        print(f"[INFO] Verbonden met {SERIAL_PORT}")
 
         while True:
             line = ser.readline().decode('utf-8').strip()
@@ -75,7 +69,7 @@ def read_from_serial():
 
             if line.startswith("Predictions"):
                 results = {'normaal': 0, 'abnormaal': 0, 'uit': 0}
-                for _ in range(3):  # Read next 3 lines
+                for _ in range(3):
                     result_line = ser.readline().decode('utf-8').strip()
                     print("[SERIAL DATA]", result_line)
                     try:
@@ -84,17 +78,15 @@ def read_from_serial():
                     except:
                         continue
                 motor_state = max(results, key=results.get)
-                confidence = f"{results[motor_state]*100:.2f}%"  # Percentage for confidence
+                confidence = f"{results[motor_state]*100:.2f}%"
                 socketio.emit('update', {'state': motor_state, 'confidence': confidence})
     except serial.SerialException:
-        print(f"[ERROR] Could not open serial port {SERIAL_PORT}")
+        print(f"[ERROR] Kan seriële poort {SERIAL_PORT} niet openen")
 
-# Handle socket connection
 @socketio.on('connect')
 def handle_connect():
     emit('update', {'state': motor_state, 'confidence': confidence})
 
-# Run the app with socketio
 if __name__ == '__main__':
     thread = threading.Thread(target=read_from_serial)
     thread.daemon = True

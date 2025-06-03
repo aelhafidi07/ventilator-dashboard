@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motorstatus Dashboard</title>
+    <title>Motor Status Dashboard</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <style>
         body {
@@ -35,16 +35,19 @@
         .status {
             font-size: 1.5em;
             margin-top: 30px;
-            font-weight: bold;
-            color: white; /* ✅ percentage wit maken */
+            color: #fff;
         }
 
         #state {
             color: white !important;
         }
 
+        #confidence {
+            color: white;
+        }
+
         .green { color: #4caf50; }
-        .yellow { color: #fbc02d; }
+        .yellow { color: #fdd835; }
         .red { color: #e53935; }
         .black { color: #616161; }
 
@@ -59,11 +62,11 @@
         @keyframes flashing {
             0% {
                 opacity: 0.7;
-                background-color: #e53935;
+                background-color: #ffcc00;
             }
             100% {
                 opacity: 1;
-                background-color: #ff1744;
+                background-color: #fdd835;
             }
         }
 
@@ -81,15 +84,41 @@
             color: #666;
             margin-top: 20px;
         }
+
+        /* Uitloggen button styling */
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .logout-btn a {
+            padding: 8px 16px;
+            background-color: #ccc;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .logout-btn a:hover {
+            background-color: #aaa;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Uitloggen Button -->
+    <div class="logout-btn">
+        <a href="/logout">Uitloggen</a>
+    </div>
+
+    <!-- Dashboard Content -->
     <div class="dashboard-box" id="dashboard-box">
-        <h1>Motorstatus: <span id="state" class="black">Wachten op data...</span></h1>
+        <h1>Motor Status: <span id="state" class="black">Wachten op data...</span></h1>
         <div class="status">
             <span id="confidence">-</span>
         </div>
-
         <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
         <div id="loading">Wachten op data...</div>
     </div>
@@ -108,7 +137,6 @@
 
         socket.on('update', function(data) {
             const state = data.state;
-
             loadingMessage.style.display = 'none';
 
             if (state !== lastState) {
@@ -122,12 +150,10 @@
                     alertSound.currentTime = 0;
                     dashboardBox.classList.remove('flashing');
                 }
-
                 lastState = state;
             }
 
             stateSpan.classList.remove('green', 'yellow', 'red', 'black');
-
             stateSpan.innerText = state;
             confidenceSpan.innerText = data.confidence;
 
@@ -136,7 +162,7 @@
                 dashboardBox.style.backgroundColor = "#4caf50";
             } else if (state === 'abnormaal') {
                 stateSpan.classList.add('yellow');
-                dashboardBox.style.backgroundColor = "#fbc02d";
+                dashboardBox.style.backgroundColor = "#fdd835";
             } else if (state === 'uit') {
                 stateSpan.classList.add('red');
                 dashboardBox.style.backgroundColor = "#e53935";
