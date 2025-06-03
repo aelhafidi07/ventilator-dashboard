@@ -55,29 +55,23 @@
             display: none;
         }
 
-        .flashing {
-            animation: flashing 0.5s infinite alternate, pulse 1s infinite alternate;
-        }
+        .flashing-yellow {
+    animation: flashing-yellow 0.5s infinite alternate, pulse 1s infinite alternate;
+}
 
-        @keyframes flashing {
-            0% {
-                opacity: 0.7;
-                background-color: #ffcc00;
-            }
-            100% {
-                opacity: 1;
-                background-color: #fdd835;
-            }
-        }
+.flashing-red {
+    animation: flashing-red 0.5s infinite alternate, pulse 1s infinite alternate;
+}
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.1);
-            }
-        }
+@keyframes flashing-yellow {
+    0% { background-color: #fbc02d; }
+    100% { background-color: #fdd835; }
+}
+
+@keyframes flashing-red {
+    0% { background-color: #e53935; }
+    100% { background-color: #ff5252; }
+}
 
         #loading {
             font-size: 1.5em;
