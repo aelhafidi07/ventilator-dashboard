@@ -5,19 +5,16 @@ from flask_socketio import SocketIO, emit
 from datetime import datetime
 import socket
 
-# Setup Flask app
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Change this to a secure secret key
+app.secret_key = 'your_secret_key'
 socketio = SocketIO(app)
 
-# Serial port settings
-SERIAL_PORT = 'COM3'  # Update if needed
+SERIAL_PORT = 'COM3'
 BAUD_RATE = 115200
 
 motor_state = "Wachten op data..."
 confidence = "-"
 
-# Hardcoded users (replace usernames/passwords as needed)
 users = {
     'admin': 'password123',
     'user1': 'pass1',
@@ -40,9 +37,8 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        ip_address = request.remote_addr  # Get the user's IP address
+        ip_address = request.remote_addr
 
-        # Log the login attempt (successful or failed)
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         if check_authentication(username, password):
@@ -68,9 +64,8 @@ def dashboard():
 
 @app.route('/logout')
 def logout():
-    # Log logout details
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    ip_address = request.remote_addr  # Get the user's IP address
+    ip_address = request.remote_addr 
     log_line = f"[{timestamp}] Logout: {session['username']} - IP: {ip_address}\n"
     with open('login_log.txt', 'a') as log_file:
         log_file.write(log_line)
@@ -103,7 +98,6 @@ def read_from_serial():
                 confidence = f"{results[motor_state]*100:.2f}%"
                 socketio.emit('update', {'state': motor_state, 'confidence': confidence})
 
-                # Log to motor_log.txt
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 log_line = f"[{timestamp}] State: {motor_state}, Confidence: {confidence}\n"
                 with open('motor_log.txt', 'a') as log_file:
