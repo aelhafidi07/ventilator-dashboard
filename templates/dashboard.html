@@ -26,6 +26,7 @@
             padding: 40px 60px;
             text-align: center;
             width: 350px;
+            transition: background-color 1s ease; /* Smooth transition for color changes */
         }
 
         h1 {
@@ -36,6 +37,12 @@
         .status {
             font-size: 1.5em;
             margin-top: 30px;
+            color: #fff; /* White color for the status text */
+        }
+
+        /* Ensure the state text is always white */
+        #state {
+            color: white !important; /* Force white color for the state text */
         }
 
         /* State colors */
@@ -48,10 +55,25 @@
         audio {
             display: none;
         }
+
+        /* Flashing effect for abnormal states */
+        .flashing {
+            animation: flashing 1s infinite alternate;
+        }
+
+        /* Flashing keyframes */
+        @keyframes flashing {
+            0% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="dashboard-box">
+    <div class="dashboard-box" id="dashboard-box">
         <h1>Motor State: <span id="state" class="black">Waiting for data...</span></h1>
         <div class="status">Confidence: <span id="confidence">-</span></div>
 
@@ -64,6 +86,7 @@
         const stateSpan = document.getElementById('state');
         const confidenceSpan = document.getElementById('confidence');
         const alertSound = document.getElementById('alert-sound');
+        const dashboardBox = document.getElementById('dashboard-box');
 
         let lastState = '';
 
@@ -77,6 +100,13 @@
                     alertSound.play().catch(() => {
                         console.log("⚠️ Unable to play sound automatically.");
                     });
+                    // Apply flashing effect for abnormal or off states
+                    dashboardBox.classList.add('flashing');
+                } else {
+                    // Stop the sound and remove flashing effect when the state is normaal
+                    alertSound.pause();
+                    alertSound.currentTime = 0; // Reset the sound to the beginning
+                    dashboardBox.classList.remove('flashing');
                 }
 
                 lastState = state;
@@ -91,15 +121,18 @@
 
             if (state === 'normaal') {
                 stateSpan.classList.add('green');
+                dashboardBox.style.backgroundColor = "#4caf50"; // Green background for normaal
             } else if (state === 'abnormaal') {
                 stateSpan.classList.add('yellow');
+                dashboardBox.style.backgroundColor = "#fbc02d"; // Yellow background for abnormaal
             } else if (state === 'uit') {
                 stateSpan.classList.add('red');
+                dashboardBox.style.backgroundColor = "#e53935"; // Red background for uit
             } else {
                 stateSpan.classList.add('black');
+                dashboardBox.style.backgroundColor = "#616161"; // Default black background
             }
         });
     </script>
 </body>
 </html>
-
