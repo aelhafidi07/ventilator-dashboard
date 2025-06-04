@@ -1,26 +1,30 @@
+import os
 import serial
 import threading
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+from dotenv import load_dotenv
 import socket
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = os.getenv("SECRET_KEY") 
 socketio = SocketIO(app)
 
-SERIAL_PORT = 'COM3'
-BAUD_RATE = 115200
+SERIAL_PORT = os.getenv("SERIAL_PORT", "COM3") 
+BAUD_RATE = int(os.getenv("BAUD_RATE", "115200"))
 
 motor_state = "Wachten op data..."
 confidence = "-"
 
 users = {
-    'admin': 'password123',
-    'user1': 'pass1',
-    'user2': 'pass2',
-    'user3': 'pass3',
-    'user4': 'pass4'
+    os.getenv("USER1_USERNAME"): os.getenv("USER1_PASSWORD"),
+    os.getenv("USER2_USERNAME"): os.getenv("USER2_PASSWORD"),
+    os.getenv("USER3_USERNAME"): os.getenv("USER3_PASSWORD"),
+    os.getenv("USER4_USERNAME"): os.getenv("USER4_PASSWORD"),
+    os.getenv("USER5_USERNAME"): os.getenv("USER5_PASSWORD"),
 }
 
 def check_authentication(username, password):

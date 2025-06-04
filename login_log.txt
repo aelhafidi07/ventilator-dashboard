@@ -11,3 +11,4 @@
 [2025-05-22 17:57:47] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
 [2025-05-22 21:44:50] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
 [2025-05-26 23:21:25] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
+[2025-06-04 19:42:51] Inlogpoging (GESLAAGD) - Gebruiker: user1 - IP: 127.0.0.1
